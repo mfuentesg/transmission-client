@@ -1,0 +1,7 @@
+{
+  "url": "http://localhost:9091/transmission/rpc",
+  "auth": {
+    "username": "transmission",
+    "password": "transmission"
+  }
+}
