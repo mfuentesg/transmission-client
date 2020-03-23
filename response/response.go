@@ -26,7 +26,9 @@ func (r *Response) writeJSON(code int, data interface{}) {
 		_, _ = r.writer.Write([]byte(fmt.Sprintf("unexpected error: %v", err)))
 	}
 	r.writer.WriteHeader(code)
-	_, _ = r.writer.Write(b)
+	if data != nil {
+		_, _ = r.writer.Write(b)
+	}
 }
 
 // JSON converts the given interface in a JSON response

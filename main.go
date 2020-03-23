@@ -8,14 +8,14 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
-	"strconv"
 	"syscall"
 	"time"
 
-	"github.com/gorilla/mux"
+	"github.com/mfuentesg/transmission-client/handler"
+
+	"github.com/julienschmidt/httprouter"
 	"github.com/mfuentesg/transmission"
 	"github.com/mfuentesg/transmission-client/config"
-	"github.com/mfuentesg/transmission-client/response"
 )
 
 func main() {
@@ -46,26 +46,19 @@ func main() {
 		log.Fatalf("could not connect to transmission service: %+v", err)
 	}
 
-	r := mux.NewRouter()
-	r.HandleFunc("/torrents/{id:[0-9]+}", func(w http.ResponseWriter, r *http.Request) {
-		vars := mux.Vars(r)
-		id, _ := strconv.Atoi(vars["id"])
-		torr, err := cl.Get(int64(id), []string{"magnetLink", "id", "name", "totalSize"})
+	router := httprouter.New()
+	h := handler.New(cl)
+	router.GET("/torrents/:id", h.GetTorrent)
+	router.GET("/torrents", h.GetTorrents)
 
-		responseWriter := response.New(w)
-		if err != nil {
-			responseWriter.JSON(http.StatusBadRequest, struct {
-				Error string `json:"error"`
-			}{
-				Error: err.Error(),
-			})
-			return
-		}
-		responseWriter.JSON(http.StatusOK, torr)
-	})
+	router.POST("/torrents/:id/start", h.HandleTorrentAction(cl.Start))
+	router.POST("/torrents/:id/start-now", h.HandleTorrentAction(cl.StartNow))
+	router.POST("/torrents/:id/stop", h.HandleTorrentAction(cl.Stop))
+	router.POST("/torrents/:id/verify", h.HandleTorrentAction(cl.Verify))
+	router.POST("/torrents/:id/reannounce", h.HandleTorrentAction(cl.Reannounce))
 
 	srv := &http.Server{
-		Handler:      r,
+		Handler:      router,
 		Addr:         ":8000",
 		WriteTimeout: 15 * time.Second,
 		ReadTimeout:  15 * time.Second,
