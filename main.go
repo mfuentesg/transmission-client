@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"flag"
 	"fmt"
 	"io/ioutil"
@@ -11,11 +12,10 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/mfuentesg/transmission-client/handler"
-
 	"github.com/julienschmidt/httprouter"
 	"github.com/mfuentesg/transmission"
 	"github.com/mfuentesg/transmission-client/config"
+	"github.com/mfuentesg/transmission-client/handler"
 )
 
 func main() {
@@ -42,7 +42,7 @@ func main() {
 		transmission.WithBasicAuth(conf.Auth.Username, conf.Auth.Password),
 	)
 
-	if err := cl.Ping(); err != nil {
+	if err := cl.Ping(context.Background()); err != nil {
 		log.Fatalf("could not connect to transmission service: %+v", err)
 	}
 
@@ -50,12 +50,13 @@ func main() {
 	h := handler.New(cl)
 	router.GET("/torrents/:id", h.GetTorrent)
 	router.GET("/torrents", h.GetTorrents)
+	router.GET("/session-stats", h.GetSessionStats)
 
-	router.POST("/torrents/:id/start", h.HandleTorrentAction(cl.Start))
-	router.POST("/torrents/:id/start-now", h.HandleTorrentAction(cl.StartNow))
-	router.POST("/torrents/:id/stop", h.HandleTorrentAction(cl.Stop))
-	router.POST("/torrents/:id/verify", h.HandleTorrentAction(cl.Verify))
-	router.POST("/torrents/:id/reannounce", h.HandleTorrentAction(cl.Reannounce))
+	// router.POST("/torrents/:id/start", h.HandleTorrentAction(cl.Start))
+	// router.POST("/torrents/:id/start-now", h.HandleTorrentAction(cl.StartNow))
+	// router.POST("/torrents/:id/stop", h.HandleTorrentAction(cl.Stop))
+	// router.POST("/torrents/:id/verify", h.HandleTorrentAction(cl.Verify))
+	// router.POST("/torrents/:id/reannounce", h.HandleTorrentAction(cl.Reannounce))
 
 	srv := &http.Server{
 		Handler:      router,
