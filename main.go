@@ -12,7 +12,7 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/julienschmidt/httprouter"
+	socketio "github.com/googollee/go-socket.io"
 	"github.com/mfuentesg/transmission"
 	"github.com/mfuentesg/transmission-client/config"
 	"github.com/mfuentesg/transmission-client/handler"
@@ -46,26 +46,29 @@ func main() {
 		log.Fatalf("could not connect to transmission service: %+v", err)
 	}
 
-	router := httprouter.New()
-	h := handler.New(cl)
-	router.GET("/torrents/:id", h.GetTorrent)
-	router.GET("/torrents", h.GetTorrents)
-	router.GET("/session-stats", h.GetSessionStats)
-
-	// router.POST("/torrents/:id/start", h.HandleTorrentAction(cl.Start))
-	// router.POST("/torrents/:id/start-now", h.HandleTorrentAction(cl.StartNow))
-	// router.POST("/torrents/:id/stop", h.HandleTorrentAction(cl.Stop))
-	// router.POST("/torrents/:id/verify", h.HandleTorrentAction(cl.Verify))
-	// router.POST("/torrents/:id/reannounce", h.HandleTorrentAction(cl.Reannounce))
+	socketServer, err := socketio.NewServer(nil)
+	if err != nil {
+		log.Fatal("could not create socket.io server")
+	}
 
 	srv := &http.Server{
-		Handler:      router,
 		Addr:         ":8000",
 		WriteTimeout: 15 * time.Second,
 		ReadTimeout:  15 * time.Second,
 	}
 
+	h := handler.New(cl)
+
+	socketServer.OnConnect("/", h.OnConnect)
+
+	http.Handle("/socket.io/", socketServer)
+	http.Handle("/", http.FileServer(http.Dir("./public")))
+
 	errs := make(chan error, 2)
+	go func() {
+		errs <- socketServer.Serve()
+		defer socketServer.Close()
+	}()
 	go func() {
 		log.Printf("server started on port %s\n", srv.Addr)
 		errs <- srv.ListenAndServe()
