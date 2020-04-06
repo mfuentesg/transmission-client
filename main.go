@@ -15,7 +15,8 @@ import (
 	socketio "github.com/googollee/go-socket.io"
 	"github.com/mfuentesg/transmission"
 	"github.com/mfuentesg/transmission-client/config"
-	"github.com/mfuentesg/transmission-client/handler"
+	"github.com/mfuentesg/transmission-client/constant"
+	"github.com/mfuentesg/transmission-client/event"
 )
 
 func main() {
@@ -57,9 +58,18 @@ func main() {
 		ReadTimeout:  15 * time.Second,
 	}
 
-	h := handler.New(cl)
+	evt := event.New(cl)
 
-	socketServer.OnConnect("/", h.OnConnect)
+	socketServer.OnConnect("/", evt.OnConnect)
+	socketServer.OnError("/", func(s socketio.Conn, e error) {
+		print("meet error:", s.Context().(string), e)
+	})
+	socketServer.OnDisconnect("/", func(s socketio.Conn, reason string) {
+		print("closed", reason)
+		print(s.Close())
+	})
+
+	socketServer.OnEvent("/", constant.EventTorrentGet, evt.TorrentGet)
 
 	http.Handle("/socket.io/", socketServer)
 	http.Handle("/", http.FileServer(http.Dir("./public")))
