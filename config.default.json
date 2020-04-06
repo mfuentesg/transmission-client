@@ -1,7 +1,7 @@
 {
-  "url": "http://localhost:9091/transmission/rpc",
-  "auth": {
-    "username": "transmission",
-    "password": "transmission"
-  }
+  "username": "transmission",
+  "password": "transmission",
+  "server_url": "http://localhost:9091/transmission/rpc",
+  "theme": "light",
+  "require_password": false
 }

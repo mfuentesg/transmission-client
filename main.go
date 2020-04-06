@@ -1,10 +1,7 @@
 package main
 
 import (
-	"context"
-	"flag"
 	"fmt"
-	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
@@ -13,39 +10,51 @@ import (
 	"time"
 
 	socketio "github.com/googollee/go-socket.io"
-	"github.com/mfuentesg/transmission"
-	"github.com/mfuentesg/transmission-client/config"
 	"github.com/mfuentesg/transmission-client/constant"
 	"github.com/mfuentesg/transmission-client/event"
+
+	"github.com/spf13/viper"
 )
 
+func initConfig() {
+	viper.SetDefault("username", "")
+	viper.SetDefault("password", "")
+	viper.SetDefault("server_url", "")
+	viper.SetDefault("theme", "light")
+	viper.SetDefault("require_auth", false)
+
+	viper.AddConfigPath(".")
+	viper.SetConfigName("config")
+	viper.SetConfigType("json")
+	viper.SetEnvPrefix("T_")
+	viper.AutomaticEnv()
+
+	if err := viper.ReadInConfig(); err != nil {
+		log.Printf("not able to read configuration file: %+v\n", err)
+	}
+
+	// merge with old configuration with the new one
+	if err := viper.MergeInConfig(); err != nil {
+		log.Printf("not able to merge configurations: %+v\n", err)
+	}
+
+	if err := viper.WriteConfig(); err != nil {
+		log.Printf("not able to write merged configuration: %+v\n", err)
+	}
+}
+
 func main() {
-	path := flag.String("config", "", "config file path")
-	flag.Parse()
+	// cl := transmission.New(
+	// 	transmission.WithURL(conf.URL),
+	// 	transmission.WithBasicAuth(conf.Auth.Username, conf.Auth.Password),
+	// )
+	//
+	// if err := cl.Ping(context.Background()); err != nil {
+	// 	log.Fatalf("could not connect to transmission service: %+v", err)
+	// }
 
-	if *path == "" {
-		flag.Usage()
-		return
-	}
-
-	b, err := ioutil.ReadFile(*path)
-	if err != nil {
-		log.Fatalf("could not load config file: %v\n", err)
-	}
-
-	conf, err := config.Parse(b)
-	if err != nil {
-		log.Fatalf("could not parse config file: %v\n", err)
-	}
-
-	cl := transmission.New(
-		transmission.WithURL(conf.URL),
-		transmission.WithBasicAuth(conf.Auth.Username, conf.Auth.Password),
-	)
-
-	if err := cl.Ping(context.Background()); err != nil {
-		log.Fatalf("could not connect to transmission service: %+v", err)
-	}
+	// set initial settings for the app
+	initConfig()
 
 	socketServer, err := socketio.NewServer(nil)
 	if err != nil {
@@ -58,7 +67,7 @@ func main() {
 		ReadTimeout:  15 * time.Second,
 	}
 
-	evt := event.New(cl)
+	evt := event.New(nil)
 
 	socketServer.OnConnect("/", evt.OnConnect)
 	socketServer.OnError("/", func(s socketio.Conn, e error) {
@@ -70,6 +79,7 @@ func main() {
 	})
 
 	socketServer.OnEvent("/", constant.EventTorrentGet, evt.TorrentGet)
+	socketServer.OnEvent("/", constant.EventConfigSet, evt.ConfigSet)
 
 	http.Handle("/socket.io/", socketServer)
 	http.Handle("/", http.FileServer(http.Dir("./public")))

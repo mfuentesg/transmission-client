@@ -119,3 +119,7 @@ func (evt *Event) TorrentGet(s socketio.Conn, message string) {
 	//
 	// s.Emit(constant.EventTorrentGet, torrent)
 }
+
+func (evt *Event) ConfigSet(s socketio.Conn) {
+	// TODO: call viper write function after set
+}
