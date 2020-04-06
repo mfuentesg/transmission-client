@@ -27,11 +27,31 @@ Based on this ~brief~ summary, the motivation of this project are:
 
 > If you are enjoying the experience with transmission like me, join to this project and let's improve it together.
 
+## Architecture
+
+![](./docs/architecture.jpg)
+
+## Configuration
+
+The following table describes the available configurations, with its respective environment variable.
+
+| Name |  Description | Env variable | Default |
+|---|---|---|---|
+| `username`   | Transmission username | `T_USERNAME` | `""` |
+| `password`   | Transmission password  | `T_PASSWORD` | `""` |
+| `server_url` | Transmission server URL | `T_SERVER_URL` | `""` |
+| `theme`      | Used by the app to define the look and feel of the application (light, dark) | `T_THEME` | `"light"` |
+
 ## Installation
 
 ### Using Docker
 ```
-docker run -d -p 8000:8000 mfuentesg/transmission-client
+docker run -d \
+    -e T_USERNAME=transmission \
+    -e T_PASSWORD=secret \
+    -e T_SERVER_URL=http://localhost:9091/transmission/rpc \
+    -e T_THEME=dark \
+    -p 8000:8000 mfuentesg/transmission-client
 ```
 
 ## Development

@@ -20,12 +20,11 @@ func initConfig() {
 	viper.SetDefault("password", "")
 	viper.SetDefault("server_url", "")
 	viper.SetDefault("theme", "light")
-	viper.SetDefault("require_auth", false)
 
 	viper.AddConfigPath(".")
 	viper.SetConfigName("config")
 	viper.SetConfigType("json")
-	viper.SetEnvPrefix("T_")
+	viper.SetEnvPrefix("T")
 	viper.AutomaticEnv()
 
 	if err := viper.ReadInConfig(); err != nil {
