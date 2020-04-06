@@ -1,26 +1,75 @@
 package event
 
 import (
-	"fmt"
+	"context"
+	"log"
 
 	socketio "github.com/googollee/go-socket.io"
 	"github.com/mfuentesg/transmission"
+	"github.com/mfuentesg/transmission-client/constant"
+	"github.com/spf13/viper"
 )
+
+func getTransmissionClient() *transmission.Client {
+	required := []string{constant.ConfigPassword, constant.ConfigUsername, constant.ConfigServerURL}
+	for _, configKey := range required {
+		if viper.GetString(configKey) == "" {
+			return nil
+		}
+	}
+
+	return transmission.New(
+		transmission.WithURL(viper.GetString("server_url")),
+		transmission.WithBasicAuth(
+			viper.GetString("username"),
+			viper.GetString("password"),
+		),
+	)
+}
 
 type Event struct {
 	Client *transmission.Client
 }
 
-func New(client *transmission.Client) *Event {
-	return &Event{
-		Client: client,
+type Error struct {
+	Message string
+}
+
+type InitConfig struct {
+	RequestAuth bool   `json:"requestAuth"`
+	Theme       string `json:"theme"`
+	ServerURL   string `json:"serverUrl"`
+	Username    string `json:"username"`
+}
+
+func New() *Event {
+	client := getTransmissionClient()
+	if client != nil {
+		if err := client.Ping(context.Background()); err != nil {
+			log.Printf("unable to connect to transmission service: %+v\n", err)
+			client = nil
+		}
 	}
+	return &Event{Client: client}
 }
 
 func (evt *Event) OnConnect(s socketio.Conn) error {
-	fmt.Println("socket connected id ->", s.ID())
-
+	s.Emit(constant.EventInit, InitConfig{
+		RequestAuth: evt.Client == nil,
+		Theme:       viper.GetString("theme"),
+		Username:    viper.GetString("username"),
+		ServerURL:   viper.GetString("server_url"),
+	})
 	return nil
+}
+
+func (evt *Event) OnError(s socketio.Conn, err error) {
+	s.Emit(constant.EventError, Error{Message: err.Error()})
+}
+
+// nolint
+func (evt *Event) OnDisconnect(s socketio.Conn, _ string) {
+	_ = s.Close()
 }
 
 func (evt *Event) TorrentGet(s socketio.Conn, message string) {
@@ -120,6 +169,6 @@ func (evt *Event) TorrentGet(s socketio.Conn, message string) {
 	// s.Emit(constant.EventTorrentGet, torrent)
 }
 
-func (evt *Event) ConfigSet(s socketio.Conn) {
+func (evt *Event) ConfigSet(s socketio.Conn, message string) {
 	// TODO: call viper write function after set
 }

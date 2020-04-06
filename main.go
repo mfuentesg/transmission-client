@@ -12,7 +12,6 @@ import (
 	socketio "github.com/googollee/go-socket.io"
 	"github.com/mfuentesg/transmission-client/constant"
 	"github.com/mfuentesg/transmission-client/event"
-
 	"github.com/spf13/viper"
 )
 
@@ -44,54 +43,36 @@ func initConfig() {
 }
 
 func main() {
-	// cl := transmission.New(
-	// 	transmission.WithURL(conf.URL),
-	// 	transmission.WithBasicAuth(conf.Auth.Username, conf.Auth.Password),
-	// )
-	//
-	// if err := cl.Ping(context.Background()); err != nil {
-	// 	log.Fatalf("could not connect to transmission service: %+v", err)
-	// }
-
-	// set initial settings for the app
-	initConfig()
-
 	socketServer, err := socketio.NewServer(nil)
 	if err != nil {
 		log.Fatal("could not create socket.io server")
 	}
 
-	srv := &http.Server{
-		Addr:         ":8000",
-		WriteTimeout: 15 * time.Second,
-		ReadTimeout:  15 * time.Second,
-	}
-
-	evt := event.New(nil)
-
-	socketServer.OnConnect("/", evt.OnConnect)
-	socketServer.OnError("/", func(s socketio.Conn, e error) {
-		print("meet error:", s.Context().(string), e)
-	})
-	socketServer.OnDisconnect("/", func(s socketio.Conn, reason string) {
-		print("closed", reason)
-		print(s.Close())
-	})
-
-	socketServer.OnEvent("/", constant.EventTorrentGet, evt.TorrentGet)
-	socketServer.OnEvent("/", constant.EventConfigSet, evt.ConfigSet)
-
 	http.Handle("/socket.io/", socketServer)
 	http.Handle("/", http.FileServer(http.Dir("./public")))
 
+	initConfig()
+
+	evt := event.New()
+	socketServer.OnConnect("/", evt.OnConnect)
+	socketServer.OnError("/", evt.OnError)
+	socketServer.OnDisconnect("/", evt.OnDisconnect)
+	socketServer.OnEvent("/", constant.EventTorrentGet, evt.TorrentGet)
+	socketServer.OnEvent("/", constant.EventConfigSet, evt.ConfigSet)
+
+	httpServer := &http.Server{
+		Addr:         ":8000",
+		WriteTimeout: 5 * time.Second,
+		ReadTimeout:  5 * time.Second,
+	}
 	errs := make(chan error, 2)
 	go func() {
 		errs <- socketServer.Serve()
 		defer socketServer.Close()
 	}()
 	go func() {
-		log.Printf("server started on port %s\n", srv.Addr)
-		errs <- srv.ListenAndServe()
+		log.Printf("server started on port %s\n", httpServer.Addr)
+		errs <- httpServer.ListenAndServe()
 	}()
 	go func() {
 		c := make(chan os.Signal, 1)

@@ -2,6 +2,5 @@
   "username": "transmission",
   "password": "transmission",
   "server_url": "http://localhost:9091/transmission/rpc",
-  "theme": "light",
-  "require_password": false
+  "theme": "light"
 }
