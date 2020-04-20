@@ -36,10 +36,10 @@ type Error struct {
 }
 
 type InitConfig struct {
-	RequestAuth bool   `json:"requestAuth"`
-	Theme       string `json:"theme"`
-	ServerURL   string `json:"serverUrl"`
-	Username    string `json:"username"`
+	Configured bool   `json:"configured"`
+	Theme      string `json:"theme"`
+	ServerURL  string `json:"serverUrl"`
+	Username   string `json:"username"`
 }
 
 func New() *Event {
@@ -55,10 +55,10 @@ func New() *Event {
 
 func (evt *Event) OnConnect(s socketio.Conn) error {
 	s.Emit(constant.EventInit, InitConfig{
-		RequestAuth: evt.Client == nil,
-		Theme:       viper.GetString("theme"),
-		Username:    viper.GetString("username"),
-		ServerURL:   viper.GetString("server_url"),
+		Configured: evt.Client != nil,
+		Theme:      viper.GetString("theme"),
+		Username:   viper.GetString("username"),
+		ServerURL:  viper.GetString("server_url"),
 	})
 	return nil
 }

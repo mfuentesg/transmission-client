@@ -3,6 +3,7 @@ import styled from 'styled-components';
 import { Socket } from 'socket.io-client';
 
 import Actions from './components/Actions';
+import Wizard from './components/Wizard';
 
 const Container = styled.div`
   display: flex;
@@ -21,7 +22,7 @@ interface Props {
 }
 
 interface Config {
-  requestAuth: boolean;
+  configured: boolean;
   theme: string;
   serverUrl: string;
   username: string;
@@ -33,12 +34,9 @@ const App: React.FunctionComponent<Props> = (props) => {
   const [connected, setConnected] = useState<boolean>(false);
 
   useEffect(() => {
-    props.socket.on('connection', () => {
-      setConnected(true);
-    });
-
     props.socket.on('init', (message: Config) => {
       setConfig(message);
+      setConnected(true);
       setLoading(false);
     });
 
@@ -67,10 +65,12 @@ const App: React.FunctionComponent<Props> = (props) => {
     );
   }
 
-  if (config.requestAuth) {
+  if (!config.configured) {
     return (
       <Container>
-        <Content>request auth ...</Content>
+        <Content>
+          <Wizard />
+        </Content>
       </Container>
     );
   }

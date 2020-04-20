@@ -7,7 +7,7 @@ export interface Props {
 }
 
 export const Label: React.FunctionComponent<Props> = (props) => {
-  return <span className={props.className}>{props.children}</span>;
+  return <label className={props.className}>{props.children}</label>;
 };
 
 const StyledLabel = styled(Label)`

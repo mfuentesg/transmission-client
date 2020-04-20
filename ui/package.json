@@ -12,12 +12,14 @@
     "@types/react-dom": "^16.9.0",
     "@types/socket.io-client": "^1.4.32",
     "@types/styled-components": "^5.1.0",
+    "@types/uuid": "^7.0.2",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
     "react-scripts": "3.4.1",
     "socket.io-client": "^2.3.0",
     "styled-components": "^5.1.0",
-    "typescript": "~3.7.2"
+    "typescript": "~3.7.2",
+    "uuid": "^7.0.3"
   },
   "scripts": {
     "lint": "tsc --noEmit && eslint 'src/**/*.{js,ts,tsx}' --quiet --fix",
