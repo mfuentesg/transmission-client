@@ -1,21 +1,87 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React, { useEffect, useState } from 'react';
+import styled from 'styled-components';
+import { Socket } from 'socket.io-client';
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a className="App-link" href="https://reactjs.org" target="_blank" rel="noopener noreferrer">
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+import Actions from './components/Actions';
+
+const Container = styled.div`
+  display: flex;
+  height: 100vh;
+  box-sizing: border-box;
+`;
+
+const Content = styled.div`
+  width: 100%;
+  background-color: #fff;
+  padding: 20px 10px;
+`;
+
+interface Props {
+  socket: typeof Socket;
 }
+
+interface Config {
+  requestAuth: boolean;
+  theme: string;
+  serverUrl: string;
+  username: string;
+}
+
+const App: React.FunctionComponent<Props> = (props) => {
+  const [config, setConfig] = useState<Partial<Config>>({});
+  const [loading, setLoading] = useState<boolean>(true);
+  const [connected, setConnected] = useState<boolean>(false);
+
+  useEffect(() => {
+    props.socket.on('connection', () => {
+      setConnected(true);
+    });
+
+    props.socket.on('init', (message: Config) => {
+      setConfig(message);
+      setLoading(false);
+    });
+
+    props.socket.on('disconnect', () => {
+      setConnected(false);
+    });
+
+    props.socket.on('reconnect', () => {
+      setConnected(true);
+    });
+  }, [props.socket]);
+
+  if (!connected) {
+    return (
+      <Container>
+        <Content>disconnected ...</Content>
+      </Container>
+    );
+  }
+
+  if (loading) {
+    return (
+      <Container>
+        <Content>loading ...</Content>
+      </Container>
+    );
+  }
+
+  if (config.requestAuth) {
+    return (
+      <Container>
+        <Content>request auth ...</Content>
+      </Container>
+    );
+  }
+
+  return (
+    <Container>
+      <Content>
+        <Actions />
+      </Content>
+    </Container>
+  );
+};
 
 export default App;
