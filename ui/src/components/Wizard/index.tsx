@@ -3,7 +3,6 @@ import styled from 'styled-components';
 
 import Input from '../Input';
 import Button from '../Button';
-import Alert from '../Alert';
 
 const Form = styled.form`
   overflow: auto;

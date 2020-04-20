@@ -7,11 +7,11 @@ interface ItemProps {
   active?: boolean;
 }
 
-const Item = styled.li<ItemProps>`
-  background-color: ${(props) => (props.active ? '#e6e8ec' : '#fff')};
-  margin-bottom: 10px;
-  border-radius: 3px;
-`;
+const Item = styled.li<ItemProps>((props) => ({
+  backgroundColor: props.active ? '#e6e8ec' : '#fff',
+  marginBottom: '10px',
+  borderRadius: '3px'
+}));
 
 export const ButtonGroup: React.FunctionComponent = () => {
   return (
