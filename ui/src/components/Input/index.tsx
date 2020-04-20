@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
-import uuid from 'uuid';
+import { v4 as uuid4 } from 'uuid';
 
 interface FieldProps {
   withIcon?: boolean;
@@ -14,16 +14,16 @@ interface Props {
   id?: string;
 }
 
-const Field = styled.input<FieldProps>`
-  appearance: none;
-  background-color: transparent;
-  border: none;
-  box-sizing: border-box;
-  color: #0f2c4c;
-  padding: 5px 10px;
-  font-size: 16px;
-  width: ${(props) => (props.withIcon ? 'calc(100% - 33px)' : '100%')};
-`;
+const Field = styled.input<FieldProps>((props) => ({
+  appearance: 'none',
+  backgroundColor: 'transparent',
+  border: 'none',
+  boxSizing: 'border-box',
+  color: '#0f2c4c',
+  padding: '5px 10px',
+  fontSize: '16px',
+  width: props.withIcon ? 'calc(100% - 33px)' : '100%'
+}));
 
 const Container = styled.div`
   border-radius: 5px;
@@ -51,7 +51,7 @@ const Input: React.FunctionComponent<Props> = (props) => {
   const [id, setId] = useState<string>(props.id || '');
 
   useEffect(() => {
-    setId(uuid.v4());
+    setId(uuid4());
   }, []);
 
   return (

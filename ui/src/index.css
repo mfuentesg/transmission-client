@@ -373,3 +373,59 @@ textarea {
 * {
     font-family: 'Baloo Paaji 2', 'sans-serif';
 }
+
+/**
+Fonts
+ */
+
+@font-face {
+    font-family: 'Baloo Paaji 2';
+    font-style: normal;
+    font-weight: 400;
+    src: url('./fonts/baloo-paaji/baloo-paaji-2-v1-latin-regular.eot'); /* IE9 Compat Modes */
+    src: local('Baloo Paaji 2 Regular'), local('BalooPaaji2-Regular'),
+    url('./fonts/baloo-paaji/baloo-paaji-2-v1-latin-regular.eot?#iefix') format('embedded-opentype'), /* IE6-IE8 */
+    url('./fonts/baloo-paaji/baloo-paaji-2-v1-latin-regular.woff2') format('woff2'), /* Super Modern Browsers */
+    url('./fonts/baloo-paaji/baloo-paaji-2-v1-latin-regular.woff') format('woff'), /* Modern Browsers */
+    url('./fonts/baloo-paaji/baloo-paaji-2-v1-latin-regular.ttf') format('truetype'), /* Safari, Android, iOS */
+    url('./fonts/baloo-paaji/baloo-paaji-2-v1-latin-regular.svg#BalooPaaji2') format('svg'); /* Legacy iOS */
+}
+
+@font-face {
+    font-family: 'Baloo Paaji 2';
+    font-style: normal;
+    font-weight: 500;
+    src: url('./fonts/baloo-paaji/baloo-paaji-2-v1-latin-500.eot'); /* IE9 Compat Modes */
+    src: local('Baloo Paaji 2 Medium'), local('BalooPaaji2-Medium'),
+    url('./fonts/baloo-paaji/baloo-paaji-2-v1-latin-500.eot?#iefix') format('embedded-opentype'), /* IE6-IE8 */
+    url('./fonts/baloo-paaji/baloo-paaji-2-v1-latin-500.woff2') format('woff2'), /* Super Modern Browsers */
+    url('./fonts/baloo-paaji/baloo-paaji-2-v1-latin-500.woff') format('woff'), /* Modern Browsers */
+    url('./fonts/baloo-paaji/baloo-paaji-2-v1-latin-500.ttf') format('truetype'), /* Safari, Android, iOS */
+    url('./fonts/baloo-paaji/baloo-paaji-2-v1-latin-500.svg#BalooPaaji2') format('svg'); /* Legacy iOS */
+}
+
+@font-face {
+    font-family: 'Baloo Paaji 2';
+    font-style: normal;
+    font-weight: 600;
+    src: url('./fonts/baloo-paaji/baloo-paaji-2-v1-latin-600.eot'); /* IE9 Compat Modes */
+    src: local('Baloo Paaji 2 SemiBold'), local('BalooPaaji2-SemiBold'),
+    url('./fonts/baloo-paaji/baloo-paaji-2-v1-latin-600.eot?#iefix') format('embedded-opentype'), /* IE6-IE8 */
+    url('./fonts/baloo-paaji/baloo-paaji-2-v1-latin-600.woff2') format('woff2'), /* Super Modern Browsers */
+    url('./fonts/baloo-paaji/baloo-paaji-2-v1-latin-600.woff') format('woff'), /* Modern Browsers */
+    url('./fonts/baloo-paaji/baloo-paaji-2-v1-latin-600.ttf') format('truetype'), /* Safari, Android, iOS */
+    url('./fonts/baloo-paaji/baloo-paaji-2-v1-latin-600.svg#BalooPaaji2') format('svg'); /* Legacy iOS */
+}
+
+@font-face {
+    font-family: 'Baloo Paaji 2';
+    font-style: normal;
+    font-weight: 700;
+    src: url('./fonts/baloo-paaji/baloo-paaji-2-v1-latin-700.eot'); /* IE9 Compat Modes */
+    src: local('Baloo Paaji 2 Bold'), local('BalooPaaji2-Bold'),
+    url('./fonts/baloo-paaji/baloo-paaji-2-v1-latin-700.eot?#iefix') format('embedded-opentype'), /* IE6-IE8 */
+    url('./fonts/baloo-paaji/baloo-paaji-2-v1-latin-700.woff2') format('woff2'), /* Super Modern Browsers */
+    url('./fonts/baloo-paaji/baloo-paaji-2-v1-latin-700.woff') format('woff'), /* Modern Browsers */
+    url('./fonts/baloo-paaji/baloo-paaji-2-v1-latin-700.ttf') format('truetype'), /* Safari, Android, iOS */
+    url('./fonts/baloo-paaji/baloo-paaji-2-v1-latin-700.svg#BalooPaaji2') format('svg'); /* Legacy iOS */
+}
