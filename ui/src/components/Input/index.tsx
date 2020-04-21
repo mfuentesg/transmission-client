@@ -16,6 +16,10 @@ interface Props {
   type?: string;
 }
 
+interface ContainerProps {
+  disabled?: boolean;
+}
+
 const Field = styled.input<FieldProps>((props) => ({
   appearance: 'none',
   backgroundColor: 'transparent',
@@ -27,11 +31,11 @@ const Field = styled.input<FieldProps>((props) => ({
   width: props.withIcon ? 'calc(100% - 33px)' : '100%'
 }));
 
-const Container = styled.div`
-  border-radius: 5px;
-  background-color: #f6f6f6;
-  border: 1px solid #f1f1f1;
-`;
+const Container = styled.div<ContainerProps>(({ disabled = false }) => ({
+  borderRadius: '5px',
+  backgroundColor: disabled ? '#dfdfdf' : '#f6f6f6',
+  border: `1px solid ${disabled ? '#d7d7d7' : '#f1f1f1'}`
+}));
 
 const Label = styled.label`
   display: block;
@@ -68,10 +72,10 @@ const Input: React.FunctionComponent<Props> = ({
     <>
       {label && <Label htmlFor={id}>{label}</Label>}
 
-      <Container>
+      <Container disabled={disabled}>
         {icon && <Icon className="material-icons">{icon}</Icon>}
         <Field
-          required={required}
+          required={required && !disabled}
           disabled={disabled}
           type={type}
           withIcon={Boolean(icon)}
