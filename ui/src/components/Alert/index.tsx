@@ -35,8 +35,8 @@ Alert.defaultProps = {
   type: 'info'
 };
 
-const StyledAlert = styled(Alert)((props) => {
-  const color = colors[props.type || 'info'];
+const StyledAlert = styled(Alert)(({ type = 'info' }) => {
+  const color = colors[type];
 
   return {
     padding: '15px 10px',

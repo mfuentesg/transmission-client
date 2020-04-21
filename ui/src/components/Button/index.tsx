@@ -12,14 +12,14 @@ export const Button: React.FunctionComponent<Props> = (props) => {
 };
 
 const StyledButton = styled(Button)`
+  background-color: #f6f6f6;
+  border-radius: 3px;
+  border: 1px solid #f1f0f0;
+  color: #11335d;
+  font-size: 16px;
+  padding: 5px 10px;
   text-align: left;
   width: ${(props) => (props.type === 'wide' ? '100%' : 'auto')};
-  font-size: 16px;
-  background-color: #f6f6f6;
-  padding: 5px 10px;
-  border: 1px solid #f1f0f0;
-  border-radius: 3px;
-  color: #11335d;
 `;
 
 export default StyledButton;

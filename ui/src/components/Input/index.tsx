@@ -12,6 +12,7 @@ interface Props {
   label?: string;
   placeholder?: string;
   required?: boolean;
+  disabled?: boolean;
   type?: string;
 }
 
@@ -29,7 +30,7 @@ const Field = styled.input<FieldProps>((props) => ({
 const Container = styled.div`
   border-radius: 5px;
   background-color: #f6f6f6;
-  border: 2px solid #f6f6f6;
+  border: 1px solid #f1f1f1;
 `;
 
 const Label = styled.label`
@@ -48,8 +49,16 @@ const Icon = styled.i`
   vertical-align: middle;
 `;
 
-const Input: React.FunctionComponent<Props> = (props) => {
-  const [id, setId] = useState<string>(props.id || '');
+const Input: React.FunctionComponent<Props> = ({
+  label = '',
+  icon = '',
+  id: fieldId = '',
+  type = 'text',
+  placeholder = '',
+  disabled = false,
+  required = false
+}) => {
+  const [id, setId] = useState<string>(fieldId);
 
   useEffect(() => {
     setId(uuid4());
@@ -57,25 +66,21 @@ const Input: React.FunctionComponent<Props> = (props) => {
 
   return (
     <>
-      {props.label && <Label htmlFor={id}>{props.label}</Label>}
+      {label && <Label htmlFor={id}>{label}</Label>}
 
       <Container>
-        {props.icon && <Icon className="material-icons">{props.icon}</Icon>}
+        {icon && <Icon className="material-icons">{icon}</Icon>}
         <Field
-          required={props.required}
-          type={props.type}
-          withIcon={Boolean(props.icon)}
-          placeholder={props.placeholder}
+          required={required}
+          disabled={disabled}
+          type={type}
+          withIcon={Boolean(icon)}
+          placeholder={placeholder}
           id={id}
         />
       </Container>
     </>
   );
-};
-
-Input.defaultProps = {
-  type: 'text',
-  required: false
 };
 
 export default Input;
