@@ -7,11 +7,12 @@ interface FieldProps {
 }
 
 interface Props {
-  placeholder?: string;
-  type?: string;
-  label?: string;
   icon?: string;
   id?: string;
+  label?: string;
+  placeholder?: string;
+  required?: boolean;
+  type?: string;
 }
 
 const Field = styled.input<FieldProps>((props) => ({
@@ -61,6 +62,7 @@ const Input: React.FunctionComponent<Props> = (props) => {
       <Container>
         {props.icon && <Icon className="material-icons">{props.icon}</Icon>}
         <Field
+          required={props.required}
           type={props.type}
           withIcon={Boolean(props.icon)}
           placeholder={props.placeholder}
@@ -72,7 +74,8 @@ const Input: React.FunctionComponent<Props> = (props) => {
 };
 
 Input.defaultProps = {
-  type: 'text'
+  type: 'text',
+  required: false
 };
 
 export default Input;

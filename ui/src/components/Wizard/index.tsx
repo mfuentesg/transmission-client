@@ -42,13 +42,19 @@ const Wizard = () => {
           label="Server URL"
           icon="link"
           type="url"
+          required
         />
       </FormBlock>
       <FormBlock>
-        <Input label="Username" icon="face" placeholder="transmission" />
+        <Input
+          label="Username"
+          icon="face"
+          placeholder="transmission"
+          required
+        />
       </FormBlock>
       <FormBlock>
-        <Input label="Password" icon="vpn_key" type="password" />
+        <Input label="Password" icon="vpn_key" type="password" required />
       </FormBlock>
       <Footer>
         <Button>Test connectivity</Button>

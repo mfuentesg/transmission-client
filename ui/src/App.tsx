@@ -31,7 +31,7 @@ interface Config {
 const App: React.FunctionComponent<Props> = (props) => {
   const [config, setConfig] = useState<Partial<Config>>({});
   const [loading, setLoading] = useState<boolean>(true);
-  const [connected, setConnected] = useState<boolean>(false);
+  const [connected, setConnected] = useState<boolean>(true);
 
   useEffect(() => {
     props.socket.on('init', (message: Config) => {
