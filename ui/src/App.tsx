@@ -63,10 +63,7 @@ const App: React.FunctionComponent = () => {
   }, []);
 
   function onConfigure() {
-    setConfig({
-      ...config,
-      configured: true
-    });
+    setConfig({ ...config, configured: true });
     window.scrollTo({ top: 0 });
   }
 

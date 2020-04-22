@@ -3,7 +3,6 @@ package event
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 	"log"
 	"sync"
 
@@ -74,7 +73,7 @@ func (evt *Event) OnConnect(s socketio.Conn) error {
 }
 
 func (evt *Event) OnError(s socketio.Conn, err error) {
-	fmt.Printf("on error: %+v\n", err)
+	log.Printf("on error: %+v\n", err)
 }
 
 func (evt *Event) OnDisconnect(s socketio.Conn, reason string) {

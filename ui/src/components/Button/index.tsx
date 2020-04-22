@@ -28,6 +28,7 @@ const StyledButton = styled(Button)((props) => ({
   color: props.disabled ? '#989898' : '#11335d',
   fontSize: '16px',
   padding: '5px 10px',
+  lineHeight: 'inherit',
   textAlign: 'left',
   width: props.type === 'wide' ? '100%' : 'auto'
 }));

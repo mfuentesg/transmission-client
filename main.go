@@ -95,5 +95,5 @@ func main() {
 		signal.Notify(c, syscall.SIGINT)
 		errs <- fmt.Errorf("%s", <-c)
 	}()
-	fmt.Printf("service terminated: %s\n", <-errs)
+	log.Printf("service terminated: %s\n", <-errs)
 }

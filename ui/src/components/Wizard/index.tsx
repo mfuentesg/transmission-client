@@ -1,4 +1,4 @@
-import React, { useState, useContext, useEffect } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { SocketContext } from '../../context';
 import Input from '../Input';
@@ -6,14 +6,15 @@ import Button from '../Button';
 import CheckBox from '../Checkbox';
 import Alert from '../Alert';
 
+// import { useSocketEvents } from '../../hooks';
+
 interface TestState {
   checking?: boolean;
-  success?: boolean;
   failed?: boolean;
 }
 
 interface Props {
-  onSubmit(): void;
+  onSubmit?(): void;
 }
 
 const Form = styled.form`
@@ -57,52 +58,58 @@ const Wizard: React.FC<Props> = ({ onSubmit: onSubmitHandler }) => {
   const onSubmit = (evt: React.FormEvent<HTMLFormElement>) => {
     evt.preventDefault();
 
-    socket.emit('config:set', JSON.stringify({ server, username, password }));
+    socket.emit('config:test', JSON.stringify({ username, server, password }));
     setTest((prevState) => ({
       ...prevState,
       failed: false,
-      success: false,
       checking: true
     }));
-
-    onSubmitHandler();
   };
 
+  const onConfigTestSuccess = () => {
+    socket.emit('config:set', JSON.stringify({ username, server, password }));
+  };
+
+  const onConfigTestFailed = () => {
+    setTest((prevState) => ({
+      ...prevState,
+      failed: true,
+      checking: false
+    }));
+  };
+
+  const onConfigSetSuccess = () => {
+    if (onSubmitHandler) {
+      onSubmitHandler();
+    }
+  };
+
+  const onConfigSetFailed = () => {};
+
   useEffect(() => {
-    socket.on('config:test:success', () => {
-      setTest((prevState) => ({
-        ...prevState,
-        checking: false,
-        success: true
-      }));
+    socket.on('config:test:success', onConfigTestSuccess);
+    socket.on('config:test:failed', onConfigTestFailed);
+    socket.on('config:set:success', onConfigSetSuccess);
+    socket.on('config:set:failed', onConfigSetFailed);
 
-      socket.emit('config:set', JSON.stringify({ server, username, password }));
-    });
-
-    socket.on('config:test:failed', () => {
-      setTest((prevState) => ({
-        ...prevState,
-        failed: true,
-        checking: false
-      }));
-    });
-  }, []);
+    return () => {
+      socket.off('config:test:success', onConfigTestSuccess);
+      socket.off('config:test:failed', onConfigTestFailed);
+      socket.off('config:set:success', onConfigSetSuccess);
+      socket.off('config:set:failed', onConfigSetFailed);
+    };
+  }, [username, server, password]);
 
   function renderAlert() {
-    let message = 'Unable to establish server connection';
-    let type = 'error';
-
-    if (!test.success && !test.failed) {
+    if (!test.failed) {
       return null;
     }
 
-    if (test.success) {
-      message = 'Connection established';
-      type = 'success';
-    }
-
-    // @ts-ignore
-    return <AlertBox type={type}>{message}</AlertBox>;
+    return (
+      <AlertBox type="error">
+        Unable to establish connection with ${server}
+      </AlertBox>
+    );
   }
 
   return (
