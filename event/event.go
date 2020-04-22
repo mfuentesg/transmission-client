@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
+	"sync"
 
 	socketio "github.com/googollee/go-socket.io"
 	"github.com/mfuentesg/transmission"
@@ -31,6 +32,7 @@ func getTransmissionClient() *transmission.Client {
 
 type Event struct {
 	Client *transmission.Client
+	mutex  sync.Mutex
 }
 
 type Error struct {
@@ -192,7 +194,7 @@ func (evt *Event) ConfigSet(s socketio.Conn, message string) {
 		s.Emit(constant.EventConfigSetFailed)
 		return
 	}
-
+	evt.mutex.Lock()
 	viper.Set(constant.ConfigPassword, conn.Password)
 	viper.Set(constant.ConfigUsername, conn.Username)
 	viper.Set(constant.ConfigServerURL, conn.ServerURL)
@@ -205,6 +207,7 @@ func (evt *Event) ConfigSet(s socketio.Conn, message string) {
 
 	evt.Client = client
 	s.Emit(constant.EventConfigSetSuccess)
+	evt.mutex.Unlock()
 }
 
 func (evt *Event) ConfigTest(s socketio.Conn, message string) {

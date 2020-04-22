@@ -12,6 +12,10 @@ interface TestState {
   failed?: boolean;
 }
 
+interface Props {
+  onSubmit(): void;
+}
+
 const Form = styled.form`
   border-radius: 5px;
   border: 1px solid #f1f1f1;
@@ -42,7 +46,7 @@ const AlertBox = styled(Alert)`
   margin-top: 15px;
 `;
 
-const Wizard = () => {
+const Wizard: React.FC<Props> = ({ onSubmit: onSubmitHandler }) => {
   const [authEnabled, setAuthEnabled] = useState(true);
   const [server, setServer] = useState<string>('');
   const [username, setUsername] = useState<string>('');
@@ -60,6 +64,8 @@ const Wizard = () => {
       success: false,
       checking: true
     }));
+
+    onSubmitHandler();
   };
 
   useEffect(() => {

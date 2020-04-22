@@ -62,6 +62,14 @@ const App: React.FunctionComponent = () => {
     });
   }, []);
 
+  function onConfigure() {
+    setConfig({
+      ...config,
+      configured: true
+    });
+    window.scrollTo({ top: 0 });
+  }
+
   if (!connected) {
     return (
       <Container>
@@ -84,7 +92,7 @@ const App: React.FunctionComponent = () => {
     return (
       <Container>
         <Content>
-          <Wizard />
+          <Wizard onSubmit={onConfigure} />
         </Content>
       </Container>
     );
