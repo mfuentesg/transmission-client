@@ -7,8 +7,10 @@ interface FieldProps {
 }
 
 interface Props {
+  onChange(evt: React.ChangeEvent<HTMLInputElement>): void;
   icon?: string;
   id?: string;
+  value?: string;
   label?: string;
   placeholder?: string;
   required?: boolean;
@@ -59,8 +61,10 @@ const Input: React.FunctionComponent<Props> = ({
   id: fieldId = '',
   type = 'text',
   placeholder = '',
+  value = '',
   disabled = false,
-  required = false
+  required = false,
+  onChange: onChangeHandler
 }) => {
   const [id, setId] = useState<string>(fieldId);
 
@@ -75,9 +79,11 @@ const Input: React.FunctionComponent<Props> = ({
       <Container disabled={disabled}>
         {icon && <Icon className="material-icons">{icon}</Icon>}
         <Field
+          onChange={onChangeHandler}
           required={required && !disabled}
           disabled={disabled}
           type={type}
+          value={value}
           withIcon={Boolean(icon)}
           placeholder={placeholder}
           id={id}

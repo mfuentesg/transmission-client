@@ -1,9 +1,16 @@
-import React, { useState } from 'react';
+import React, { useState, useContext, useEffect } from 'react';
 import styled from 'styled-components';
-
+import { SocketContext } from '../../context';
 import Input from '../Input';
 import Button from '../Button';
 import CheckBox from '../Checkbox';
+import Alert from '../Alert';
+
+interface TestState {
+  checking?: boolean;
+  success?: boolean;
+  failed?: boolean;
+}
 
 const Form = styled.form`
   border-radius: 5px;
@@ -37,11 +44,61 @@ const SaveButton = styled(Button)`
   text-align: center;
 `;
 
+const AlertBox = styled(Alert)`
+  margin-top: 15px;
+`;
+
 const Wizard = () => {
   const [authEnabled, setAuthEnabled] = useState(true);
+  const [server, setServer] = useState<string>('');
+  const [username, setUsername] = useState<string>('');
+  const [password, setPassword] = useState<string>('');
+  const [test, setTest] = useState<TestState>({});
+  const socket = useContext(SocketContext);
+
+  const onSubmit = (evt: React.FormEvent<HTMLFormElement>) => {
+    evt.preventDefault();
+  };
+
+  const onTestConnectivity = () => {
+    if (!socket) {
+      return;
+    }
+
+    socket.emit(
+      'config:test',
+      JSON.stringify({ serverUrl: server, username, password })
+    );
+    setTest((prevState) => ({
+      ...prevState,
+      failed: false,
+      success: false,
+      checking: true
+    }));
+  };
+
+  const onSaveSettings = () => {};
+
+  useEffect(() => {
+    socket.on('config:test:success', () => {
+      setTest((prevState) => ({
+        ...prevState,
+        checking: false,
+        success: true
+      }));
+    });
+
+    socket.on('config:test:failed', () => {
+      setTest((prevState) => ({
+        ...prevState,
+        failed: true,
+        checking: false
+      }));
+    });
+  }, []);
 
   return (
-    <Form>
+    <Form onSubmit={onSubmit}>
       <Title>Setup</Title>
       <FormBlock>
         <Input
@@ -50,11 +107,17 @@ const Wizard = () => {
           icon="link"
           type="url"
           required
+          disabled={test.checking}
+          value={server}
+          onChange={(evt) => {
+            setServer(evt.target.value);
+          }}
         />
       </FormBlock>
       <FormBlock>
         <CheckBox
           label="Is it authentication enabled?"
+          disabled={test.checking}
           checked={authEnabled}
           onChange={(evt: React.ChangeEvent<HTMLInputElement>) => {
             setAuthEnabled(evt.target.checked);
@@ -65,24 +128,37 @@ const Wizard = () => {
         <Input
           label="Username"
           icon="face"
-          disabled={!authEnabled}
+          disabled={!authEnabled || test.checking}
           placeholder="transmission"
           required
+          value={username}
+          onChange={(evt) => {
+            setUsername(evt.target.value);
+          }}
         />
       </FormBlock>
       <FormBlock>
         <Input
-          disabled={!authEnabled}
+          disabled={!authEnabled || test.checking}
           label="Password"
           icon="vpn_key"
           type="password"
           required
+          value={password}
+          onChange={(evt) => {
+            setPassword(evt.target.value);
+          }}
         />
       </FormBlock>
       <Footer>
-        <Button>Test connectivity</Button>
-        <SaveButton>Save</SaveButton>
+        <Button disabled={test.checking} onClick={onTestConnectivity}>
+          Test connectivity
+        </Button>
+        <SaveButton disabled={!test.success} onClick={onSaveSettings}>
+          Save
+        </SaveButton>
       </Footer>
+      <AlertBox type="error">Unable to connect</AlertBox>
     </Form>
   );
 };

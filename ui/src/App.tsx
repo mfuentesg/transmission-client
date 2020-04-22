@@ -1,9 +1,9 @@
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import styled from 'styled-components';
-import { Socket } from 'socket.io-client';
-
+import { SocketContext } from './context';
 import Actions from './components/Actions';
 import Wizard from './components/Wizard';
+import Spinner from './components/Spinner';
 
 const Container = styled.div`
   display: flex;
@@ -15,11 +15,17 @@ const Content = styled.div`
   width: 100%;
   background-color: #fff;
   padding: 20px 10px;
+  position: relative;
 `;
 
-interface Props {
-  socket: typeof Socket;
-}
+const CenteredSpinner = styled(Spinner)`
+  position: absolute;
+  top: 0;
+  right: 0;
+  left: 0;
+  bottom: 0;
+  margin: auto auto;
+`;
 
 interface Config {
   configured: boolean;
@@ -28,26 +34,33 @@ interface Config {
   username: string;
 }
 
-const App: React.FunctionComponent<Props> = (props) => {
+const App: React.FunctionComponent = () => {
   const [config, setConfig] = useState<Partial<Config>>({});
   const [loading, setLoading] = useState<boolean>(true);
   const [connected, setConnected] = useState<boolean>(true);
+  const socket = useContext(SocketContext);
 
   useEffect(() => {
-    props.socket.on('init', (message: Config) => {
+    socket.on('end', () => {});
+
+    socket.on('init', (message: Config) => {
       setConfig(message);
       setConnected(true);
       setLoading(false);
     });
 
-    props.socket.on('disconnect', () => {
+    socket.on('disconnect', () => {
       setConnected(false);
     });
 
-    props.socket.on('reconnect', () => {
+    socket.on('close', () => {
+      socket.close();
+    });
+
+    socket.on('reconnect', () => {
       setConnected(true);
     });
-  }, [props.socket]);
+  }, []);
 
   if (!connected) {
     return (
@@ -60,7 +73,9 @@ const App: React.FunctionComponent<Props> = (props) => {
   if (loading) {
     return (
       <Container>
-        <Content>loading ...</Content>
+        <Content>
+          <CenteredSpinner height={50} />
+        </Content>
       </Container>
     );
   }

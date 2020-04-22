@@ -70,9 +70,11 @@ func main() {
 	evt := event.New()
 	socketServer.OnConnect("/", evt.OnConnect)
 	socketServer.OnError("/", evt.OnError)
-	socketServer.OnDisconnect("/", evt.OnDisconnect)
+	// socketServer.OnDisconnect("/", evt.OnDisconnect)
 	socketServer.OnEvent("/", constant.EventTorrentGet, evt.TorrentGet)
 	socketServer.OnEvent("/", constant.EventConfigSet, evt.ConfigSet)
+
+	socketServer.OnEvent("/", constant.EventConfigTest, evt.ConfigTest)
 
 	httpServer := &http.Server{
 		Addr:         ":8000",

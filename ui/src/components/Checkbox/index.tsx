@@ -6,6 +6,7 @@ interface Props {
   label?: string;
   id?: string;
   checked?: boolean;
+  disabled?: boolean;
   onChange?: Function;
 }
 
@@ -50,6 +51,7 @@ const IconHolder = styled.span<IconProps>((props) => ({
 const CheckBox: React.FunctionComponent<Props> = ({
   checked = false,
   onChange,
+  disabled = false,
   id: fieldId = '',
   label = ''
 }) => {
@@ -70,6 +72,7 @@ const CheckBox: React.FunctionComponent<Props> = ({
       <Input
         type="checkbox"
         id={id}
+        disabled={disabled}
         checked={checked}
         onChange={onChangeHandler}
       />

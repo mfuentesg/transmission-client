@@ -3,23 +3,33 @@ import styled from 'styled-components';
 
 export interface Props {
   type?: string;
-  onClick?: Function;
+  disabled?: boolean;
+  onClick?(evt: React.MouseEvent<HTMLButtonElement>): void;
   className?: string;
 }
 
-export const Button: React.FunctionComponent<Props> = (props) => {
-  return <button className={props.className}>{props.children}</button>;
+export const Button: React.FunctionComponent<Props> = ({
+  children,
+  onClick,
+  className = '',
+  disabled = false
+}) => {
+  return (
+    <button disabled={disabled} className={className} onClick={onClick}>
+      {children}
+    </button>
+  );
 };
 
-const StyledButton = styled(Button)`
-  background-color: #f6f6f6;
-  border-radius: 3px;
-  border: 1px solid #f1f0f0;
-  color: #11335d;
-  font-size: 16px;
-  padding: 5px 10px;
-  text-align: left;
-  width: ${(props) => (props.type === 'wide' ? '100%' : 'auto')};
-`;
+const StyledButton = styled(Button)((props) => ({
+  backgroundColor: props.disabled ? '#dcdcdc' : '#f6f6f6',
+  borderRadius: '3px',
+  border: '1px solid #f1f1f1',
+  color: props.disabled ? '#989898' : '#11335d',
+  fontSize: '16px',
+  padding: '5px 10px',
+  textAlign: 'left',
+  width: props.type === 'wide' ? '100%' : 'auto'
+}));
 
 export default StyledButton;

@@ -39,7 +39,8 @@ const StyledAlert = styled(Alert)(({ type = 'info' }) => {
   const color = colors[type];
 
   return {
-    padding: '15px 10px',
+    textAlign: 'left',
+    padding: '12px 10px',
     backgroundColor: color.background,
     border: `1px solid ${color.border}`,
     borderRadius: '5px',

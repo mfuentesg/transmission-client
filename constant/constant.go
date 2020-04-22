@@ -12,6 +12,10 @@ const (
 	EventConfigSetSuccess = "config:set:success"
 	EventConfigSetFailed  = "config:set:failed"
 
+	EventConfigTest        = "config:test"
+	EventConfigTestSuccess = "config:test:success"
+	EventConfigTestFailed  = "config:test:failed"
+
 	ConfigServerURL = "server_url"
 	ConfigUsername  = "username"
 	ConfigPassword  = "password"

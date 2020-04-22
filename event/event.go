@@ -2,6 +2,8 @@ package event
 
 import (
 	"context"
+	"encoding/json"
+	"fmt"
 	"log"
 
 	socketio "github.com/googollee/go-socket.io"
@@ -35,6 +37,12 @@ type Error struct {
 	Message string
 }
 
+type ConnectionConfig struct {
+	ServerURL string `json:"serverUrl"`
+	Username  string `json:"username"`
+	Password  string `json:"password"`
+}
+
 type InitConfig struct {
 	Configured bool   `json:"configured"`
 	Theme      string `json:"theme"`
@@ -64,13 +72,14 @@ func (evt *Event) OnConnect(s socketio.Conn) error {
 }
 
 func (evt *Event) OnError(s socketio.Conn, err error) {
+	fmt.Printf("on error: %+v - %+v\n", err, s.ID())
 	s.Emit(constant.EventError, Error{Message: err.Error()})
 }
 
 // nolint
-func (evt *Event) OnDisconnect(s socketio.Conn, _ string) {
-	_ = s.Close()
-}
+// func (evt *Event) OnDisconnect(s socketio.Conn, _ string) {
+// 	_ = s.Close()
+// }
 
 func (evt *Event) TorrentGet(s socketio.Conn, message string) {
 	// TODO: parse message into TorrentGetPayload
@@ -171,4 +180,24 @@ func (evt *Event) TorrentGet(s socketio.Conn, message string) {
 
 func (evt *Event) ConfigSet(s socketio.Conn, message string) {
 	// TODO: call viper write function after set
+}
+
+func (evt *Event) ConfigTest(s socketio.Conn, message string) {
+	var conn ConnectionConfig
+	if err := json.Unmarshal([]byte(message), &conn); err != nil {
+		s.Emit(constant.EventConfigTestFailed)
+		return
+	}
+
+	client := transmission.New(
+		transmission.WithURL(conn.ServerURL),
+		transmission.WithBasicAuth(conn.Username, conn.Password),
+	)
+
+	if err := client.Ping(context.Background()); err != nil {
+		s.Emit(constant.EventConfigTestFailed)
+		return
+	}
+
+	s.Emit(constant.EventConfigTestSuccess)
 }

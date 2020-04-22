@@ -1,17 +1,16 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import io from 'socket.io-client';
+import socket from './socket';
 import * as serviceWorker from './serviceWorker';
 import App from './App';
-
+import { SocketContext } from './context';
 import './index.css';
-
-const url = process.env.REACT_APP_SOCKET_SERVER_URL || '';
-const socket = io(url);
 
 ReactDOM.render(
   <React.StrictMode>
-    <App socket={socket} />
+    <SocketContext.Provider value={socket.connect()}>
+      <App />
+    </SocketContext.Provider>
   </React.StrictMode>,
   document.getElementById('root')
 );
