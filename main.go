@@ -36,7 +36,7 @@ func initConfig() {
 		log.Printf("not able to merge configurations: %+v\n", err)
 	}
 
-	if err := viper.WriteConfig(); err != nil {
+	if err := viper.WriteConfigAs("config.json"); err != nil {
 		log.Printf("not able to write merged configuration: %+v\n", err)
 	}
 }
@@ -70,7 +70,7 @@ func main() {
 	evt := event.New()
 	socketServer.OnConnect("/", evt.OnConnect)
 	socketServer.OnError("/", evt.OnError)
-	// socketServer.OnDisconnect("/", evt.OnDisconnect)
+	socketServer.OnDisconnect("/", evt.OnDisconnect)
 	socketServer.OnEvent("/", constant.EventTorrentGet, evt.TorrentGet)
 	socketServer.OnEvent("/", constant.EventConfigSet, evt.ConfigSet)
 

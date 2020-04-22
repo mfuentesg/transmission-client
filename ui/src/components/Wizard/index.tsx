@@ -38,12 +38,6 @@ const Title = styled.h2`
   margin-bottom: 20px;
 `;
 
-const SaveButton = styled(Button)`
-  margin-left: 10px;
-  min-width: 100px;
-  text-align: center;
-`;
-
 const AlertBox = styled(Alert)`
   margin-top: 15px;
 `;
@@ -58,17 +52,8 @@ const Wizard = () => {
 
   const onSubmit = (evt: React.FormEvent<HTMLFormElement>) => {
     evt.preventDefault();
-  };
 
-  const onTestConnectivity = () => {
-    if (!socket) {
-      return;
-    }
-
-    socket.emit(
-      'config:test',
-      JSON.stringify({ serverUrl: server, username, password })
-    );
+    socket.emit('config:set', JSON.stringify({ server, username, password }));
     setTest((prevState) => ({
       ...prevState,
       failed: false,
@@ -77,8 +62,6 @@ const Wizard = () => {
     }));
   };
 
-  const onSaveSettings = () => {};
-
   useEffect(() => {
     socket.on('config:test:success', () => {
       setTest((prevState) => ({
@@ -86,6 +69,8 @@ const Wizard = () => {
         checking: false,
         success: true
       }));
+
+      socket.emit('config:set', JSON.stringify({ server, username, password }));
     });
 
     socket.on('config:test:failed', () => {
@@ -96,6 +81,23 @@ const Wizard = () => {
       }));
     });
   }, []);
+
+  function renderAlert() {
+    let message = 'Unable to establish server connection';
+    let type = 'error';
+
+    if (!test.success && !test.failed) {
+      return null;
+    }
+
+    if (test.success) {
+      message = 'Connection established';
+      type = 'success';
+    }
+
+    // @ts-ignore
+    return <AlertBox type={type}>{message}</AlertBox>;
+  }
 
   return (
     <Form onSubmit={onSubmit}>
@@ -151,14 +153,9 @@ const Wizard = () => {
         />
       </FormBlock>
       <Footer>
-        <Button disabled={test.checking} onClick={onTestConnectivity}>
-          Test connectivity
-        </Button>
-        <SaveButton disabled={!test.success} onClick={onSaveSettings}>
-          Save
-        </SaveButton>
+        <Button disabled={test.checking}>Test & Save</Button>
       </Footer>
-      <AlertBox type="error">Unable to connect</AlertBox>
+      {renderAlert()}
     </Form>
   );
 };

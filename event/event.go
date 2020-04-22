@@ -38,7 +38,7 @@ type Error struct {
 }
 
 type ConnectionConfig struct {
-	ServerURL string `json:"serverUrl"`
+	ServerURL string `json:"server"`
 	Username  string `json:"username"`
 	Password  string `json:"password"`
 }
@@ -72,14 +72,12 @@ func (evt *Event) OnConnect(s socketio.Conn) error {
 }
 
 func (evt *Event) OnError(s socketio.Conn, err error) {
-	fmt.Printf("on error: %+v - %+v\n", err, s.ID())
-	s.Emit(constant.EventError, Error{Message: err.Error()})
+	fmt.Printf("on error: %+v\n", err)
 }
 
-// nolint
-// func (evt *Event) OnDisconnect(s socketio.Conn, _ string) {
-// 	_ = s.Close()
-// }
+func (evt *Event) OnDisconnect(s socketio.Conn, reason string) {
+	log.Println(s.ID(), "-> disconnected from server", reason)
+}
 
 func (evt *Event) TorrentGet(s socketio.Conn, message string) {
 	// TODO: parse message into TorrentGetPayload
@@ -179,7 +177,34 @@ func (evt *Event) TorrentGet(s socketio.Conn, message string) {
 }
 
 func (evt *Event) ConfigSet(s socketio.Conn, message string) {
-	// TODO: call viper write function after set
+	var conn ConnectionConfig
+	if err := json.Unmarshal([]byte(message), &conn); err != nil {
+		s.Emit(constant.EventConfigSetFailed)
+		return
+	}
+
+	client := transmission.New(
+		transmission.WithURL(conn.ServerURL),
+		transmission.WithBasicAuth(conn.Username, conn.Password),
+	)
+
+	if err := client.Ping(context.Background()); err != nil {
+		s.Emit(constant.EventConfigSetFailed)
+		return
+	}
+
+	viper.Set(constant.ConfigPassword, conn.Password)
+	viper.Set(constant.ConfigUsername, conn.Username)
+	viper.Set(constant.ConfigServerURL, conn.ServerURL)
+
+	if err := viper.WriteConfig(); err != nil {
+		log.Println("not able to write config file", err)
+		s.Emit(constant.EventConfigSetFailed)
+		return
+	}
+
+	evt.Client = client
+	s.Emit(constant.EventConfigSetSuccess)
 }
 
 func (evt *Event) ConfigTest(s socketio.Conn, message string) {

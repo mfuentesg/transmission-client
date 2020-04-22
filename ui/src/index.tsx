@@ -6,6 +6,12 @@ import App from './App';
 import { SocketContext } from './context';
 import './index.css';
 
+const s = socket.connect();
+
+window.addEventListener('beforeunload', function () {
+  s.disconnect();
+});
+
 ReactDOM.render(
   <React.StrictMode>
     <SocketContext.Provider value={socket.connect()}>
