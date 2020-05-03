@@ -1,14 +1,24 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import './index.css';
-import App from './App';
+import socket from './socket';
 import * as serviceWorker from './serviceWorker';
+import App from './App';
+import { SocketContext } from './context';
+import './index.css';
+
+const s = socket.connect();
+
+window.addEventListener('beforeunload', function () {
+  s.disconnect();
+});
 
 ReactDOM.render(
   <React.StrictMode>
-    <App />
+    <SocketContext.Provider value={socket.connect()}>
+      <App />
+    </SocketContext.Provider>
   </React.StrictMode>,
-  document.getElementById('root'),
+  document.getElementById('root')
 );
 
 // If you want your app to work offline and load faster, you can change

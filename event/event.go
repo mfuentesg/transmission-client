@@ -2,7 +2,9 @@ package event
 
 import (
 	"context"
+	"encoding/json"
 	"log"
+	"sync"
 
 	socketio "github.com/googollee/go-socket.io"
 	"github.com/mfuentesg/transmission"
@@ -29,17 +31,24 @@ func getTransmissionClient() *transmission.Client {
 
 type Event struct {
 	Client *transmission.Client
+	mutex  sync.Mutex
 }
 
 type Error struct {
 	Message string
 }
 
+type ConnectionConfig struct {
+	ServerURL string `json:"server"`
+	Username  string `json:"username"`
+	Password  string `json:"password"`
+}
+
 type InitConfig struct {
-	RequestAuth bool   `json:"requestAuth"`
-	Theme       string `json:"theme"`
-	ServerURL   string `json:"serverUrl"`
-	Username    string `json:"username"`
+	Configured bool   `json:"configured"`
+	Theme      string `json:"theme"`
+	ServerURL  string `json:"serverUrl"`
+	Username   string `json:"username"`
 }
 
 func New() *Event {
@@ -55,21 +64,20 @@ func New() *Event {
 
 func (evt *Event) OnConnect(s socketio.Conn) error {
 	s.Emit(constant.EventInit, InitConfig{
-		RequestAuth: evt.Client == nil,
-		Theme:       viper.GetString("theme"),
-		Username:    viper.GetString("username"),
-		ServerURL:   viper.GetString("server_url"),
+		Configured: evt.Client != nil,
+		Theme:      viper.GetString("theme"),
+		Username:   viper.GetString("username"),
+		ServerURL:  viper.GetString("server_url"),
 	})
 	return nil
 }
 
 func (evt *Event) OnError(s socketio.Conn, err error) {
-	s.Emit(constant.EventError, Error{Message: err.Error()})
+	log.Printf("on error: %+v\n", err)
 }
 
-// nolint
-func (evt *Event) OnDisconnect(s socketio.Conn, _ string) {
-	_ = s.Close()
+func (evt *Event) OnDisconnect(s socketio.Conn, reason string) {
+	log.Println(s.ID(), "-> disconnected from server", reason)
 }
 
 func (evt *Event) TorrentGet(s socketio.Conn, message string) {
@@ -170,5 +178,53 @@ func (evt *Event) TorrentGet(s socketio.Conn, message string) {
 }
 
 func (evt *Event) ConfigSet(s socketio.Conn, message string) {
-	// TODO: call viper write function after set
+	var conn ConnectionConfig
+	if err := json.Unmarshal([]byte(message), &conn); err != nil {
+		s.Emit(constant.EventConfigSetFailed)
+		return
+	}
+
+	client := transmission.New(
+		transmission.WithURL(conn.ServerURL),
+		transmission.WithBasicAuth(conn.Username, conn.Password),
+	)
+
+	if err := client.Ping(context.Background()); err != nil {
+		s.Emit(constant.EventConfigSetFailed)
+		return
+	}
+	evt.mutex.Lock()
+	viper.Set(constant.ConfigPassword, conn.Password)
+	viper.Set(constant.ConfigUsername, conn.Username)
+	viper.Set(constant.ConfigServerURL, conn.ServerURL)
+
+	if err := viper.WriteConfig(); err != nil {
+		log.Println("not able to write config file", err)
+		s.Emit(constant.EventConfigSetFailed)
+		return
+	}
+
+	evt.Client = client
+	s.Emit(constant.EventConfigSetSuccess)
+	evt.mutex.Unlock()
+}
+
+func (evt *Event) ConfigTest(s socketio.Conn, message string) {
+	var conn ConnectionConfig
+	if err := json.Unmarshal([]byte(message), &conn); err != nil {
+		s.Emit(constant.EventConfigTestFailed)
+		return
+	}
+
+	client := transmission.New(
+		transmission.WithURL(conn.ServerURL),
+		transmission.WithBasicAuth(conn.Username, conn.Password),
+	)
+
+	if err := client.Ping(context.Background()); err != nil {
+		s.Emit(constant.EventConfigTestFailed)
+		return
+	}
+
+	s.Emit(constant.EventConfigTestSuccess)
 }
