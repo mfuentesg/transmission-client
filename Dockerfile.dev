@@ -1,0 +1,14 @@
+FROM golang:1.15.7 as builder
+LABEL maintainer="Marcelo Fuentes <marceloe.fuentes@gmail.com>"
+WORKDIR /build
+
+ENV GOOS=linux
+ENV GOARCH=amd64
+ENV CGO_ENABLED=0
+
+COPY go.mod go.sum ./
+RUN curl -sSfL https://raw.githubusercontent.com/cosmtrek/air/master/install.sh | sh -s -- -b $(go env GOPATH)/bin
+EXPOSE 8000
+
+COPY . .
+CMD air

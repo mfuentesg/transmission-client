@@ -1,6 +1,32 @@
 ---
 version: "3"
 services:
+  transmission-ui:
+    container_name: transmission-ui
+    stdin_open: true
+    build:
+      context: ./ui
+      dockerfile: Dockerfile
+    env_file:
+      - ./ui/.env
+    volumes:
+      - ./ui:/app
+      - /app/node_modules/
+    ports:
+      - 3000:3000
+
+  transmission-service:
+    container_name: transmission-service
+    build:
+      dockerfile: ./Dockerfile.dev
+      context: .
+    ports:
+      - 8000:8000
+    volumes:
+      - ./:/app
+    working_dir: /app
+    command: air
+
   transmission:
     image: linuxserver/transmission
     container_name: transmission
