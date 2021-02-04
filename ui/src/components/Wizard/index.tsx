@@ -115,6 +115,7 @@ const Wizard: React.FC<Props> = ({ onSubmit: onSubmitHandler }: Props) => {
     }
   };
 
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
   const onConfigSetFailed = () => {};
 
   useEffect(() => {
