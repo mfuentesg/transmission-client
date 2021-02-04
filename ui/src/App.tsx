@@ -4,12 +4,7 @@ import { SocketContext } from './context';
 import Actions from './components/Actions';
 import Wizard from './components/Wizard';
 import Spinner from './components/Spinner';
-
-const Container = styled.div`
-  display: flex;
-  height: 100vh;
-  box-sizing: border-box;
-`;
+import { Container } from './components/Grid';
 
 const Content = styled.div`
   width: 100%;
@@ -41,8 +36,6 @@ const App: React.FunctionComponent = () => {
   const socket = useContext(SocketContext);
 
   useEffect(() => {
-    socket.on('end', () => {});
-
     socket.on('init', (message: Config) => {
       setConfig(message);
       setConnected(true);
@@ -62,14 +55,14 @@ const App: React.FunctionComponent = () => {
     });
   }, []);
 
-  function onConfigure() {
+  function onConfigure(): void {
     setConfig({ ...config, configured: true });
     window.scrollTo({ top: 0 });
   }
 
   if (!connected) {
     return (
-      <Container>
+      <Container height="100vh">
         <Content>disconnected ...</Content>
       </Container>
     );

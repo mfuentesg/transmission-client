@@ -27,11 +27,11 @@ module.exports = {
   plugins: ['react', '@typescript-eslint', 'prettier'],
   rules: {
     '@typescript-eslint/no-use-before-define': 'off',
+    '@typescript-eslint/no-explicit-any': 'off',
     'prettier/prettier': ['error', { singleQuote: true }],
     'import/no-cycle': 0,
     'import/no-named-as-default': 0,
     'react/destructuring-assignment': 0,
-    'react/forbid-prop-types': 0,
     'react/jsx-filename-extension': [
       1,
       {

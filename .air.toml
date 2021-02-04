@@ -1,5 +1,5 @@
 root = "."
 
 [build]
-exclude_dir = ["ui"]
+exclude_dir = ["ui", "docs", ".github", ".docker"]
 

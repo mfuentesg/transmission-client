@@ -64,6 +64,9 @@ func main() {
 		socketServer.ServeHTTP(w, r)
 	})
 	http.Handle("/", http.FileServer(http.Dir("./public")))
+	http.HandleFunc("/ping", func(w http.ResponseWriter, _ *http.Request) {
+		w.Write([]byte("pong"))
+	})
 
 	initConfig()
 
@@ -71,9 +74,10 @@ func main() {
 	socketServer.OnConnect("/", evt.OnConnect)
 	socketServer.OnError("/", evt.OnError)
 	socketServer.OnDisconnect("/", evt.OnDisconnect)
-	socketServer.OnEvent("/", constant.EventTorrentGet, evt.TorrentGet)
-	socketServer.OnEvent("/", constant.EventConfigSet, evt.ConfigSet)
 
+	socketServer.OnEvent("/", constant.EventTorrentGet, evt.TorrentGet)
+
+	socketServer.OnEvent("/", constant.EventConfigSet, evt.ConfigSet)
 	socketServer.OnEvent("/", constant.EventConfigTest, evt.ConfigTest)
 
 	httpServer := &http.Server{
