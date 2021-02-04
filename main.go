@@ -65,7 +65,7 @@ func main() {
 	})
 	http.Handle("/", http.FileServer(http.Dir("./public")))
 	http.HandleFunc("/ping", func(w http.ResponseWriter, _ *http.Request) {
-		w.Write([]byte("pong"))
+		_, _ = w.Write([]byte("pong"))
 	})
 
 	initConfig()
