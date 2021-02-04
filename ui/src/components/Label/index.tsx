@@ -6,7 +6,7 @@ export interface Props {
   className?: string;
 }
 
-export const Label: React.FunctionComponent<Props> = (props) => {
+export const Label: React.FC<Props> = (props: Props) => {
   return <label className={props.className}>{props.children}</label>;
 };
 

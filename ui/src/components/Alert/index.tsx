@@ -5,6 +5,7 @@ interface Props {
   type?: 'info' | 'success' | 'error' | 'warning';
   fixed?: boolean;
   className?: string;
+  children?: React.ReactNode;
 }
 
 const colors: { [key: string]: { [key: string]: string } } = {
@@ -26,7 +27,7 @@ const colors: { [key: string]: { [key: string]: string } } = {
   }
 };
 
-export const Alert: React.FunctionComponent<Props> = (props) => {
+export const Alert: React.FunctionComponent<Props> = (props: Props) => {
   return <div className={props.className}>{props.children}</div>;
 };
 

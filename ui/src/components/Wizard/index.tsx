@@ -51,7 +51,7 @@ const SaveButton = styled(Button)`
   margin-left: 10px;
 `;
 
-const Wizard: React.FC<Props> = ({ onSubmit: onSubmitHandler }) => {
+const Wizard: React.FC<Props> = ({ onSubmit: onSubmitHandler }: Props) => {
   const [authEnabled, setAuthEnabled] = useState(true);
   const [server, setServer] = useState<string>('');
   const [username, setUsername] = useState<string>('');

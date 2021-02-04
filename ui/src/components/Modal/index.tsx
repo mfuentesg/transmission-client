@@ -2,6 +2,7 @@ import React, { useRef, useEffect } from 'react';
 import styled from 'styled-components';
 
 import { Container, Cell } from '../Grid';
+import Icon from '../Icon';
 import device from '../../styles/device';
 
 const Overlay = styled.div`
@@ -37,7 +38,7 @@ const ModalContainer = styled.div`
 
 const ModalContent = styled(Cell)`
   background-color: white;
-  font-family: 'Montserrat', serif;
+  font-family: 'Baloo Paaji 2', 'sans-serif';
   padding: 20px 10px;
 `;
 
@@ -45,7 +46,7 @@ const ModalTitle = styled.span`
   display: inline-block;
   vertical-align: middle;
   text-transform: uppercase;
-  font-family: 'Montserrat', serif;
+  font-family: 'Baloo Paaji 2', 'sans-serif';
 `;
 
 const CloseButton = styled.button`
@@ -55,17 +56,23 @@ const CloseButton = styled.button`
   vertical-align: middle;
 `;
 
+const ModalIcon = styled(Icon)`
+  margin-right: 10px;
+  color: #ffc0cb;
+`;
+
+const CloseIcon = styled(Icon)`
+  color: #717171;
+`;
+
 interface Props {
   onClose: Function;
-  children: React.ReactNode;
-  title: string;
+  children?: React.ReactNode;
+  title?: string;
+  icon?: string;
 }
 
-const Modal = ({
-  onClose,
-  children = null,
-  title = ''
-}: Props): React.ReactNode => {
+const Modal = ({ onClose, children = null, title = '', icon = '' }: Props) => {
   const node = useRef(null);
 
   const onCloseHandler = (evt: React.MouseEvent | KeyboardEvent): void => {
@@ -104,11 +111,12 @@ const Modal = ({
           <Cell padding="20px 10px">
             <Container justifyContent="space-between" alignItems="center">
               <Cell>
+                {icon.length > 0 && <ModalIcon size={36}>{icon}</ModalIcon>}
                 <ModalTitle>{title}</ModalTitle>
               </Cell>
               <Cell>
                 <CloseButton type="button" onClick={onCloseHandler}>
-                  x
+                  <CloseIcon size={24}>close</CloseIcon>
                 </CloseButton>
               </Cell>
             </Container>

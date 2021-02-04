@@ -6,6 +6,7 @@ export interface Props {
   disabled?: boolean;
   onClick?(evt: React.MouseEvent<HTMLButtonElement>): void;
   className?: string;
+  children?: React.ReactNode;
 }
 
 export const Button: React.FunctionComponent<Props> = ({
@@ -13,7 +14,7 @@ export const Button: React.FunctionComponent<Props> = ({
   onClick,
   className = '',
   disabled = false
-}) => {
+}: Props) => {
   return (
     <button disabled={disabled} className={className} onClick={onClick}>
       {children}

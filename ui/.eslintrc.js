@@ -28,6 +28,7 @@ module.exports = {
   rules: {
     '@typescript-eslint/no-use-before-define': 'off',
     '@typescript-eslint/no-explicit-any': 'off',
+    '@typescript-eslint/explicit-function-return-type': 'off',
     'prettier/prettier': ['error', { singleQuote: true }],
     'import/no-cycle': 0,
     'import/no-named-as-default': 0,

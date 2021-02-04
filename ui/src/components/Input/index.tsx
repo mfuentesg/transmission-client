@@ -22,7 +22,7 @@ interface ContainerProps {
   disabled?: boolean;
 }
 
-const Field = styled.input<FieldProps>((props) => ({
+const Field = styled.input<FieldProps>((props: FieldProps) => ({
   appearance: 'none',
   backgroundColor: 'transparent',
   border: 'none',
@@ -65,7 +65,7 @@ const Input: React.FunctionComponent<Props> = ({
   disabled = false,
   required = false,
   onChange: onChangeHandler
-}) => {
+}: Props) => {
   const [id, setId] = useState<string>(fieldId);
 
   useEffect(() => {

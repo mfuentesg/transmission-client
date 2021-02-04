@@ -54,7 +54,7 @@ const CheckBox: React.FunctionComponent<Props> = ({
   disabled = false,
   id: fieldId = '',
   label = ''
-}) => {
+}: Props) => {
   const [id, setId] = useState<string>(fieldId);
 
   useEffect(() => {

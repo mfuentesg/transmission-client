@@ -24,7 +24,7 @@ const NavItem = styled('li')<NavItemProps>`
   margin: 0 5px;
 `;
 
-const Actions: React.FunctionComponent = () => {
+const Actions: React.FC = () => {
   return (
     <Nav>
       <NavItem position="right">
